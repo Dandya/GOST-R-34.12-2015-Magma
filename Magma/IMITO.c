@@ -32,35 +32,31 @@ uint64_t createHelpingKey(uint32_t* ptrOnArrKeys, int numberOfKeyToCreate)
 }
 /*
 Функция getMAC реализует режим выработки имитовставки.
-char* nameInputFile - указатель на массив символов, содержащий имя фаила с открытым текстом;
+FILE* inputFile - указатель на открытый фаил для чтения;
 uint32_t* key - указатель на 256 битный ключ;
 uint8_t sizeMAC - 8-ми битовое число, являющееся размером имитовставки в битах.
 */
-uint64_t getMAC(char* nameInputFile, uint32_t* key , uint8_t sizeMAC)
+uint64_t getMAC(FILE* input, uint64_t countBytesForCrypt_or_tmp, uint32_t* key, uint8_t sizeMAC)
 {
-    //open input file
-    FILE* input = fopen(nameInputFile, "r");
-    if(input == NULL)
-    {
-        printf("error open files\n");
-        return -1;
-    }
     //get count full blocks
-    uint64_t tmp = getSizeInputFile(input);
-    uint8_t residue = tmp%SIZE_BLOCK;
-    uint32_t countFullBlocks = residue == 0 ? tmp/SIZE_BLOCK - 1 : tmp/SIZE_BLOCK;
+    if(countBytesForCrypt_or_tmp == ALL_FILE)
+    {
+        countBytesForCrypt_or_tmp = getSizeInputFile(input);
+    }
+    uint8_t residue = countBytesForCrypt_or_tmp%SIZE_BLOCK;
+    uint32_t countFullBlocks = residue == 0 ? countBytesForCrypt_or_tmp/SIZE_BLOCK - 1 : countBytesForCrypt_or_tmp/SIZE_BLOCK;
     //create iterationKeys
     uint32_t ptrOnArrKeys[32];
     createEncryptKeys(ptrOnArrKeys, key);
     //create MAC
     uint64_t block; 
-    tmp = 0;
+    countBytesForCrypt_or_tmp = 0;
     for(int iteration = 0; iteration<countFullBlocks; iteration++)
     {
         fread(&block, SIZE_BLOCK, 1, input);
-        block ^= tmp;
+        block ^= countBytesForCrypt_or_tmp;
         block = schemeFeistel(block, ptrOnArrKeys);
-        tmp = block;
+        countBytesForCrypt_or_tmp = block;
     }
     //read last block and create helping key
     uint64_t helpingKey;
@@ -75,9 +71,8 @@ uint64_t getMAC(char* nameInputFile, uint32_t* key , uint8_t sizeMAC)
         fread(&block, SIZE_BLOCK, 1, input);
         helpingKey = createHelpingKey(ptrOnArrKeys, CREATE_KEY_1);
     }
-    fclose(input);
     //create need key
-    block ^= tmp^helpingKey;
+    block ^= countBytesForCrypt_or_tmp^helpingKey;
     block = schemeFeistel(block, ptrOnArrKeys);
     return block>>(64 - sizeMAC);
 }

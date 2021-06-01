@@ -391,7 +391,11 @@ TEST(ecb, CipherECB_proc_added_nulls_1_full_block)
     fclose(openText);
     //encryption
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_1), 0);
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_1), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -402,7 +406,11 @@ TEST(ecb, CipherECB_proc_added_nulls_1_full_block)
     EXPECT_EQ(fgetc(cipherText), EOF);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_1, 8), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_1, 8), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -441,7 +449,11 @@ TEST(ecb, CipherECB_proc_added_nulls_1_not_full_block)
     fclose(openText);
     //encryption
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_1), 0);
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_1), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -452,7 +464,11 @@ TEST(ecb, CipherECB_proc_added_nulls_1_not_full_block)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_1, 4), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_1, 4), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -494,7 +510,11 @@ TEST(ecb, CipherECB_proc_added_nulls_2_not_full_block)
     fclose(openText);
     //encryption
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -505,7 +525,11 @@ TEST(ecb, CipherECB_proc_added_nulls_2_not_full_block)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -541,7 +565,11 @@ TEST(ecb, CipherECB_proc_added_nulls_2_full_block)
     }
     fclose(openText);
     //encryption
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -552,7 +580,11 @@ TEST(ecb, CipherECB_proc_added_nulls_2_full_block)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     for(int iteration = 1; iteration <= 4; iteration++)
@@ -566,18 +598,22 @@ TEST(ecb, CipherECB_proc_added_nulls_2_full_block)
 /*********************************************************/
 TEST(ecb, SPEED_ENCRYPTION_MODE)
 {
-    char nameInputFile[] = "OpenText.txt";
-    char nameOutputFile[] = "CipherText.txt";
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2);
+    FILE* input = fopen("OpenText.txt", "rb");
+    FILE* output = fopen("CipherText.txt", "wb");
+    EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2);
+    fclose(input);
+    fclose(output);
 }
 /*********************************************************/
 TEST(ecb, SPEED_DECRYPTION_MODE)
 {
-    char nameInputFile[] = "OpenText.txt";
-    char nameOutputFile[] = "CipherText.txt";
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0);
+    FILE* input = fopen("CipherText.txt", "rb");
+    FILE* output = fopen("OpenText.txt", "wb");
+    DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0);
+    fclose(input);
+    fclose(output);
 }
 /*********************************************************/
 TEST(ecb, SmallTest1)
@@ -597,8 +633,12 @@ TEST(ecb, SmallTest1)
     }
     fclose(openText);
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
     //encryption
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     fread(&block, 8, 1, cipherText);
@@ -606,7 +646,11 @@ TEST(ecb, SmallTest1)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     fread(&block, 8, 1, openText);
@@ -632,8 +676,12 @@ TEST(ecb, SmallTest2)
     }
     fclose(openText);
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
     //encryption
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     fread(&block, 8, 1, cipherText);
@@ -641,7 +689,11 @@ TEST(ecb, SmallTest2)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     fread(&block, 8, 1, openText);
@@ -667,8 +719,12 @@ TEST(ecb, SmallTest3)
     }
     fclose(openText);
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
     //encryption
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     fread(&block, 8, 1, cipherText);
@@ -676,7 +732,11 @@ TEST(ecb, SmallTest3)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     fread(&block, 8, 1, openText);
@@ -702,8 +762,12 @@ TEST(ecb, SmallTest4)
     }
     fclose(openText);
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
+    FILE* input = fopen(nameInputFile, "rb");
+    FILE* output = fopen(nameOutputFile, "wb");
     //encryption
-    EXPECT_EQ(EncryptECB(nameInputFile, nameOutputFile, key, PROC_ADD_NULLS_2), 0);
+    EXPECT_EQ(EncryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2), 0);
+    fclose(input);
+    fclose(output);
     //check cipher text
     FILE* cipherText = fopen("CipherText.txt", "r");
     fread(&block, 8, 1, cipherText);
@@ -711,7 +775,11 @@ TEST(ecb, SmallTest4)
     EXPECT_EQ(feof(cipherText), 0);
     fclose(cipherText);
     //decryption
-    EXPECT_EQ(DecryptECB(nameOutputFile, nameInputFile, key, PROC_ADD_NULLS_2, 0), 0);
+    input = fopen(nameOutputFile, "rb");
+    output = fopen(nameInputFile, "wb");
+    EXPECT_EQ(DecryptECB(input, output, ALL_FILE, key, PROC_ADD_NULLS_2, 0), 0);
+    fclose(input);
+    fclose(output);
     //check open text
     openText = fopen("OpenText.txt", "r");
     fread(&block, 8, 1, openText);
@@ -759,7 +827,9 @@ TEST(imito, GetMAC)
     }
     fclose(openText);
     uint32_t key[8]={0xFCFDFEFF, 0xF8F9FAFB, 0xF4F5F6F7, 0xF0F1F2F3, 0x33221100, 0x77665544, 0xBBAA9988, 0xFFEEDDCC};
-    EXPECT_EQ(getMAC(nameInputFile, key, 32), 0x154e7210);
+    FILE* input = fopen(nameInputFile, "rb");
+    EXPECT_EQ(getMAC(input, ALL_FILE, key, 32), 0x154e7210);
+    fclose(input);
 }
 /*********************************************************/
 int main(int argc, char **argv)

@@ -1,25 +1,18 @@
 /*
 Функция EncryptECB реализует алгоритм зашифрования открытого текста.
-char* nameInputFile - указатель на массив символов, содержащий имя фаила с открытым текстом;
-char* nameOutputFile - указатель на массив символов, содержащий имя фаила, в который нужно записать закрытый текст;
+FILE* inputFile - указатель на открытый фаил для чтения;
+FILE* outputFile - указатель на открытый фаил для записи;
 uint32_t* key - указатель на 256 битный ключ;
 int modePadding - номер процедуры дополнения(по ГОСТ 34.13-2015).
 */
-int EncryptECB(char* nameInputFile, char* nameOutputFile, uint32_t* key , int modePadding)
+int EncryptECB(FILE* inputFile, FILE* outputFile, uint64_t countBytesForCrypt, uint32_t* key , int modePadding)
 {
-    //open files
-    FILE* input = fopen(nameInputFile, "r");
-    FILE* output = fopen(nameOutputFile, "w");
-    if(input == NULL || output == NULL)
-    {
-        printf("error open files\n");
-        fclose(input);
-        fclose(output);
-        return 2 ;
-    }
     //get count full blocks
-    uint64_t sizeInputFile = getSizeInputFile(input);
-    uint32_t countFullBlocks = sizeInputFile/SIZE_BLOCK;
+    if(countBytesForCrypt == ALL_FILE)
+    {
+        countBytesForCrypt = getSizeInputFile(inputFile);
+    }
+    uint32_t countFullBlocks = countBytesForCrypt/SIZE_BLOCK;
     //create iteration keys
     uint32_t ptrOnArrKeys[32];
     createEncryptKeys(ptrOnArrKeys, key);
@@ -27,22 +20,16 @@ int EncryptECB(char* nameInputFile, char* nameOutputFile, uint32_t* key , int mo
     uint64_t block;
     for(uint64_t iteration = 0; iteration<countFullBlocks; iteration++)
     {
-        if(fread(&block, SIZE_BLOCK, 1, input) != 1)
-        {
-            printf("error in fread\n");
-            fclose(input);
-            fclose(output);
-            return 3;
-        }
+        readBlock(inputFile, (uint8_t*)&block, SIZE_BLOCK);
         block = schemeFeistel(block, ptrOnArrKeys);
-        fwrite(&block, SIZE_BLOCK, 1, output);
+        fwrite(&block, SIZE_BLOCK, 1, outputFile);
     }
     //cipher last block
-    if(sizeInputFile%SIZE_BLOCK != 0) // sizeInputFile%8 - count bytes in last block
+    if(countBytesForCrypt%SIZE_BLOCK != 0) // countBytesForCrypt%8 - count bytes in last block
     {
-        //block = readLastBlockInputFile(input, modePadding, sizeInputFile%8);
-        fread(&block, sizeInputFile%SIZE_BLOCK, 1, input);
-        procPadding((uint8_t*)&block, SIZE_BLOCK - sizeInputFile%SIZE_BLOCK, modePadding);
+        //block = readLastBlockInputFile(inputFile, modePadding, countBytesForCrypt%8);
+        readBlock(inputFile, (uint8_t*)&block, countBytesForCrypt%SIZE_BLOCK);
+        procPadding((uint8_t*)&block, SIZE_BLOCK - countBytesForCrypt%SIZE_BLOCK, modePadding);
     }
     else if(modePadding == PROC_ADD_NULLS_2)
     {
@@ -50,39 +37,38 @@ int EncryptECB(char* nameInputFile, char* nameOutputFile, uint32_t* key , int mo
     }
     else
     {
-        fclose(input);
-        fclose(output);
         return 0;
     }
     block = schemeFeistel(block, ptrOnArrKeys);
-    fwrite(&block, 8, 1, output);
-    //close files
-    fclose(input);
-    fclose(output);
+    fwrite(&block, 8, 1, outputFile);
     return 0;
 }
 
 /*
 Функция DecryptECB реализует алгоритм расшифрования открытого текста.
-char* nameInputFile - указатель на массив символов, содержащий имя фаила с открытым текстом;
-char* nameOutputFile - указатель на массив символов, содержащий имя фаила, в который нужно записать закрытый текст;
+FILE* inputFile - указатель на открытый фаил для чтения;
+FILE* outputFile - указатель на открытый фаил для записи;
 uint32_t* key - указатель на 256 битный ключ;
 int modePadding - номер процедуры дополнения(по ГОСТ 34.13-2015);
 uint8_t countByteInLastBlock - 8-ми битное беззнаковое число, являющееся количеством байт в последнем блоке при расшифровании(нужно для первой процедуры дополнения).
 */
-int DecryptECB(char* nameInputFile, char* nameOutputFile, uint32_t* key , int modePadding,  uint8_t countByteInLastBlock)
+int DecryptECB(FILE* inputFile, FILE* outputFile, uint64_t countBytesForCrypt, uint32_t* key , int modePadding,  uint8_t countByteInLastBlock)
 {
     //open files
-    FILE* input = fopen(nameInputFile, "r");
-    FILE* output = fopen(nameOutputFile, "w");
-    if(input == NULL || output == NULL)
+    /*FILE* inputFile = fopen(nameInputFile, "rb");
+    FILE* outputFile = fopen(nameOutputFile, "wb");
+    if(inputFile == NULL || outputFile == NULL)
     {
         printf("error open files\n");
         return 2;
-    }
+    }*/
+    
     //get count full blocks
-    uint64_t sizeInputFile = getSizeInputFile(input);
-    uint32_t countFullBlocks = sizeInputFile/SIZE_BLOCK - 1;
+    if(countBytesForCrypt == ALL_FILE)
+    {
+        countBytesForCrypt = getSizeInputFile(inputFile);
+    }
+    uint32_t countFullBlocks = countBytesForCrypt/SIZE_BLOCK - 1;
     //create iteration keys
     uint32_t ptrOnArrKeys[32];
     createDecryptKeys(ptrOnArrKeys, key);    
@@ -90,28 +76,21 @@ int DecryptECB(char* nameInputFile, char* nameOutputFile, uint32_t* key , int mo
     uint64_t block;
     for(uint64_t iteration = 0; iteration<countFullBlocks; iteration++)
     {
-        if(fread(&block, SIZE_BLOCK, 1, input) != 1)
-        {
-            printf("error in fread\n");
-            return 3;
-        }
+        readBlock(inputFile, (uint8_t*)&block, SIZE_BLOCK);
         block = schemeFeistel(block, ptrOnArrKeys);
-        fwrite(&block, SIZE_BLOCK, 1, output);
+        fwrite(&block, SIZE_BLOCK, 1, outputFile);
     }
     //cipher last block
-    fread(&block, SIZE_BLOCK, 1, input);
+    readBlock(inputFile, (uint8_t*)&block, SIZE_BLOCK);
     block = schemeFeistel(block, ptrOnArrKeys);
     if(modePadding == PROC_ADD_NULLS_2)
     {
-        fwrite(&block, countBytesForWrite((uint8_t*)&block), 1, output);
+        fwrite(&block, countBytesForWrite((uint8_t*)&block), 1, outputFile);
     }
     else 
     {
-        fwrite(&block, countByteInLastBlock, 1, output);   
+        fwrite(&block, countByteInLastBlock, 1, outputFile);   
     }
-    //close files
-    fclose(input);
-    fclose(output);
     return 0;
 }
 
@@ -144,7 +123,8 @@ uint64_t procPadding(uint8_t* data, int countAddByte, int mode)
 }
 
 /*
-Функция countBytesForWrite обеспечивает правильное расшифрование закрытого текста, а имеено возвращает количество байт последнего блока, которое нужно записать в фаил, чтобы получить открытый текст, зашифрованныйпри помощи второй процедуры дополнения.
+Функция countBytesForWrite обеспечивает правильное расшифрование закрытого текста, а имеено возвращает количество байт последнего блока, которое нужно записать в фаил, чтобы получить открытый текст, зашифрованный при помощи второй процедуры дополнения.
+Принимает на вход:
 uint8_t* blockInBytes -указатель на ячейку памяти с последним блоком закрытого текста.
 */
 uint8_t countBytesForWrite(uint8_t* blockInBytes)
@@ -155,5 +135,21 @@ uint8_t countBytesForWrite(uint8_t* blockInBytes)
         indexByte--;
     }
     return indexByte; // count bytes in open text
+}
+
+/*
+Функция readBlock обеспечивает чтение блока из фаила.
+Принимает на вход:
+FILE* file - файловый дескриптор; 
+uint8_t* ptrOnBlock - указатель на блок;
+uint8_t countByteForRead - количество считываемых байт.
+*/
+static void readBlock(FILE* file, uint8_t* ptrOnBlock ,uint8_t countByteForRead)
+{
+    while(countByteForRead--)
+    {
+        *ptrOnBlock = fgetc(file);
+        ptrOnBlock++;
+    }
 }
 /*********************************************************/

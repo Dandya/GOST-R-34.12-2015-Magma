@@ -180,29 +180,49 @@ uint64_t main(int argc, char** argv)
         case ECB:
            if(crypt == 'e')
            {
-               if(EncryptECB(nameInputFile, nameOutputFile, key, modePadding) != 1)
+               FILE* input = fopen(nameInputFile, "rb");
+               FILE* output = fopen(nameOutputFile, "wb");
+               if(input == NULL || output == NULL)
+               {
+                   printf("fatal error: could not open file\n");
+                   return 1;
+               }
+               if(EncryptECB(input, output, ALL_FILE, key, modePadding) != 0)
                {
                     printf("fatal error: failed to complete EncryptECB");
-                    return 0;
+                    return 1;
                }
+               fclose(input);
+               fclose(output);
            }
            else
            {
-                if(DecryptECB(nameInputFile, nameOutputFile, key, modePadding, countByteInLastBlock) != 1)
-               {
+                FILE* input = fopen(nameInputFile, "rb");
+                FILE* output = fopen(nameOutputFile, "wb");
+                if(input == NULL || output == NULL)
+                {
+                   printf("fatal error: could not open file\n");
+                   return 1;
+                }
+                if(DecryptECB(input, output, ALL_FILE, key, modePadding, countByteInLastBlock) != 0)
+                {
                     printf("fatal error: failed to complete DecryptECB");
-                    return 0;
-               }
+                    return 1;
+                }
+                fclose(input);
+                fclose(output);
            }
            break;
         case IMITO:
            {
-           uint64_t result = getMAC(nameInputFile, key, sizeMAC);
-           printf("%lld\n", result);
-           return result;
+                FILE* input = fopen(nameInputFile, "rb");
+                uint64_t result = getMAC(input,ALL_FILE, key, sizeMAC);
+                fclose(input);
+                printf("%lld\n", result);
+                return result;
            }
     }
-    return 1;
+    return 0;
 }
 /*********************************************************/
 int parameterDefinition(char* prm)

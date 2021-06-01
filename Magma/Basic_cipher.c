@@ -3,7 +3,7 @@
 Принимает на вход:
  uint32_t rightPart - 32-х битное беззнаковое число, являющиеся половиной шифруемого блока.
 */
-uint32_t S_box(uint32_t rightPart)
+static uint32_t S_box(uint32_t rightPart)
 {
     int S [8][16]={
     {12, 4, 6, 2, 10, 5, 11, 9, 14, 8, 13, 7, 0,  3, 15, 1},
@@ -26,7 +26,7 @@ uint32_t S_box(uint32_t rightPart)
 /*
 Циклическое смещение на 11 бит.
 */
-#define cyclicShift(x) (x & 0b11111111111<<21)>>21 | x<<11
+#define cyclicShift(x) (x>>21 | x<<11)
 
 /*
 Функция oneFeistelIteration, производящая одну из итераций схемы Фейстеля с 1 по 31 итерацию. 
@@ -34,11 +34,10 @@ uint32_t S_box(uint32_t rightPart)
 uint32_t* leftAndRightPart - указатель на 32-х битное беззнаковое число шифруемого текста;
 uint32_t key - итерационный ключ, размером в 32 бита.
 */
-void oneFeistelIteration(uint32_t* leftAndRightPart, uint32_t key)
+static void oneFeistelIteration(uint32_t* leftAndRightPart, uint32_t key)
 {
     uint32_t result = S_box( leftAndRightPart[0] + key );
-    result = cyclicShift(result);
-    result = leftAndRightPart[1] ^ result;
+    result = leftAndRightPart[1] ^ cyclicShift(result);
     leftAndRightPart[1] = leftAndRightPart[0];
     leftAndRightPart[0] = result;
 }
@@ -49,7 +48,7 @@ void oneFeistelIteration(uint32_t* leftAndRightPart, uint32_t key)
 uint32_t* leftAndRightPart - указатель на 32-х битное беззнаковое число шифруемого текста;
 uint32_t key - итерационный ключ, размером в 32 бита.
 */
-void lastFeistelIteration(uint32_t* leftAndRightPart, uint32_t key)
+static void lastFeistelIteration(uint32_t* leftAndRightPart, uint32_t key)
 {
     uint32_t result = S_box( leftAndRightPart[0] + key );
     result = cyclicShift(result);
@@ -115,7 +114,7 @@ uint64_t getSizeInputFile(FILE* input)
 uint64_t block - 64-х битное беззнаковое число, являющиеся шифруемым блоком;
 uint32_t* ptrOnArrKeys - указатель на массив, содержащий итерационные ключи для выполнения блочного шифра.
 */
-uint64_t schemeFeistel(uint64_t block, uint32_t* ptrOnArrKeys)
+static uint64_t schemeFeistel(uint64_t block, uint32_t* ptrOnArrKeys)
 {
     uint32_t* leftAndRightPart = (uint32_t*)&block; // 0 - rightPart, 1 - leftPart 
     for(int iteration = 0; iteration<31; iteration++)
