@@ -33,6 +33,7 @@ uint64_t createHelpingKey(uint32_t* ptrOnArrKeys, int numberOfKeyToCreate)
 /*
 Функция getMAC реализует режим выработки имитовставки.
 FILE* inputFile - указатель на открытый фаил для чтения;
+uint64_t countBytesForCrypt_or_tmp - количество байт из фаила, которые нужно обрабатывать;
 uint32_t* key - указатель на 256 битный ключ;
 uint8_t sizeMAC - 8-ми битовое число, являющееся размером имитовставки в битах.
 */

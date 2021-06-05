@@ -2,6 +2,7 @@
 Функция EncryptECB реализует алгоритм зашифрования открытого текста.
 FILE* inputFile - указатель на открытый фаил для чтения;
 FILE* outputFile - указатель на открытый фаил для записи;
+uint64_t countBytesForCrypt - число, обозначающее количество байт для шифрвания в фаиле для чтения;
 uint32_t* key - указатель на 256 битный ключ;
 int modePadding - номер процедуры дополнения(по ГОСТ 34.13-2015).
 */
@@ -27,7 +28,6 @@ int EncryptECB(FILE* inputFile, FILE* outputFile, uint64_t countBytesForCrypt, u
     //cipher last block
     if(countBytesForCrypt%SIZE_BLOCK != 0) // countBytesForCrypt%8 - count bytes in last block
     {
-        //block = readLastBlockInputFile(inputFile, modePadding, countBytesForCrypt%8);
         readBlock(inputFile, (uint8_t*)&block, countBytesForCrypt%SIZE_BLOCK);
         procPadding((uint8_t*)&block, SIZE_BLOCK - countBytesForCrypt%SIZE_BLOCK, modePadding);
     }
@@ -54,16 +54,6 @@ uint8_t countByteInLastBlock - 8-ми битное беззнаковое чис
 */
 int DecryptECB(FILE* inputFile, FILE* outputFile, uint64_t countBytesForCrypt, uint32_t* key , int modePadding,  uint8_t countByteInLastBlock)
 {
-    //open files
-    /*FILE* inputFile = fopen(nameInputFile, "rb");
-    FILE* outputFile = fopen(nameOutputFile, "wb");
-    if(inputFile == NULL || outputFile == NULL)
-    {
-        printf("error open files\n");
-        return 2;
-    }*/
-    
-    //get count full blocks
     if(countBytesForCrypt == ALL_FILE)
     {
         countBytesForCrypt = getSizeInputFile(inputFile);
